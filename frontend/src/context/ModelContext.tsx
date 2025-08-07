@@ -10,7 +10,7 @@ interface ModelContextType {
 export const ModelContext = createContext<ModelContextType | undefined>(undefined);
 
 export const ModelProvider = ({ children }: { children: ReactNode }) => {
-  const [model, setModel] = useState<string>("gpt-4o-mini");
+  const [model, setModel] = useState<string>("gpt-5");
 
   useEffect(() => {
     const storedModel = localStorage.getItem("selectedModel");

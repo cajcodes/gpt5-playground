@@ -32,7 +32,7 @@ async def update_summary(thread_id: str, messages: list, client: AsyncOpenAI):
     if last_assistant_message:
         try:
             response = await client.chat.completions.create(
-                model="gpt-4o-mini",  # Using a smaller model for summarization
+                model="gpt-5-nano",  # Using a smaller model for summarization
                 messages=[
                     {"role": "system", "content": "Summarize the following in 50 tokens or less."},
                     {"role": "user", "content": last_assistant_message['content']}

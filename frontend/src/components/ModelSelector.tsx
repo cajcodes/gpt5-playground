@@ -3,7 +3,7 @@
 import { useContext } from "react";
 import { ModelContext } from "../context/ModelContext";
 
-const models = ["gpt-4o-mini", "gpt-4o", "gpt-5"];
+const models = ["gpt-5", "gpt-5-mini", "gpt-5-nano"];
 
 export default function ModelSelector() {
   const context = useContext(ModelContext);

@@ -24,7 +24,7 @@ export default function Home() {
           <div>
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold leading-tight">
               Build, test, and iterate with
-              <span className="block bg-gradient-to-r from-blue-400 via-sky-300 to-cyan-300 bg-clip-text text-transparent"> GPT‑5, 4o, and more</span>
+              <span className="block bg-gradient-to-r from-blue-400 via-sky-300 to-cyan-300 bg-clip-text text-transparent"> the GPT‑5 family</span>
             </h1>
             <p className="mt-6 text-base sm:text-lg text-gray-300 max-w-prose">
               Streaming UI, cost meter, model selector, and memory. Everything you need to explore
@@ -62,7 +62,7 @@ export default function Home() {
                 </div>
                 <div className="rounded-lg border border-white/10 bg-white/5 p-4">
                   <p className="text-white/70">Model Selector</p>
-                  <p className="mt-1 font-semibold">Switch GPT‑5 / 4o / mini</p>
+                  <p className="mt-1 font-semibold">Switch GPT‑5 / mini / nano</p>
                 </div>
                 <div className="rounded-lg border border-white/10 bg-white/5 p-4">
                   <p className="text-white/70">Memory</p>

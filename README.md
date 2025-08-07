@@ -1,68 +1,70 @@
-# GPT-5 Playground
+# GPT‑5 Playground
 
-This project is a simple chat application that uses a FastAPI backend and a Next.js frontend to interact with OpenAI's chat completion models.
+Streaming chat playground for the GPT‑5 family (gpt-5, gpt-5-mini, gpt-5-nano). Built with FastAPI + Next.js. Features:
+
+- Streaming token output over WebSockets
+- Usage + cost meter
+- Model selector (gpt‑5 / mini / nano)
+- Optional per‑thread memory with summarization
+- Markdown rendering with syntax highlighting
 
 ## Getting Started
 
 ### Prerequisites
 
-- Python 3.8+
+- Python 3.10+
 - Node.js 18.17+
 - An OpenAI API key
 
 ### Backend Setup
 
-1.  **Create and activate a virtual environment:**
+1.  Create and activate a virtual environment:
     ```bash
     python3 -m venv .venv
     source .venv/bin/activate
     ```
-
-2.  **Install Python dependencies:**
+2.  Install Python dependencies:
     ```bash
     pip install -r requirements.txt
     ```
-
-3.  **Set up environment variables:**
-    Copy the example `.env` file and add your OpenAI API key.
+3.  Set up environment variables:
     ```bash
-    cp .env.example .env
-    ```
-    Then, open `.env` and add your key:
-    ```
-    OPENAI_API_KEY=sk-...
+    echo "OPENAI_API_KEY=sk-...\nOPENAI_MODEL=gpt-5\nPORT=8000" > .env
     ```
 
 ### Frontend Setup
 
-1.  **Install Node.js dependencies:**
-    ```bash
-    cd frontend
-    npm install
-    ```
+```bash
+cd frontend
+npm install
+```
 
-## Running the Application
+## Run
 
-### All-in-One (Recommended)
-
-To run both the backend and frontend servers concurrently, use the following command from the project root:
-
+All-in-one (dev):
 ```bash
 make dev
 ```
 
-The backend will be available at `http://localhost:8000` and the frontend at `http://localhost:3000`.
-
-### Running Separately
-
-**Backend:**
+Or separately:
 ```bash
-make run
+make run              # backend at http://localhost:8000
+cd frontend && npm run dev  # frontend at http://localhost:3000
 ```
 
-**Frontend:**
-```bash
-cd frontend
-npm run dev
-```
+## Pricing (USD per 1K tokens)
+
+| Model       | Prompt | Completion |
+| ----------- | ------:| ----------:|
+| gpt-5       |  1.25  |      10.00 |
+| gpt-5-mini  |  0.25  |       2.00 |
+| gpt-5-nano  |  0.05  |       0.40 |
+
+> Update `backend/main.py` `PRICING` if OpenAI publishes new prices.
+
+## Notes
+
+- WebSocket endpoint: `ws://localhost:8000/ws`
+- REST streaming endpoint: `POST http://localhost:8000/chat`
+- Toggle per-thread memory: `PATCH /toggle_memory` with `{ "thread_id": "..." }`
 

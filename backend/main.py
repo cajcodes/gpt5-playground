@@ -15,9 +15,10 @@ from . import memory
 # --- Pricing ---
 # todo: load from config
 PRICING = {
-    "gpt-4o-mini": {"prompt": 0.00015, "completion": 0.0006},
-    "gpt-4o": {"prompt": 0.005, "completion": 0.015},
-    "gpt-5": {"prompt": 0.005, "completion": 0.015}, # Placeholder pricing
+    # Prices are USD per 1K tokens
+    "gpt-5": {"prompt": 1.25, "completion": 10.00},
+    "gpt-5-mini": {"prompt": 0.25, "completion": 2.00},
+    "gpt-5-nano": {"prompt": 0.05, "completion": 0.40},
 }
 
 def calc_cost(prompt_tokens: int, completion_tokens: int, model: str):
@@ -33,7 +34,7 @@ def calc_cost(prompt_tokens: int, completion_tokens: int, model: str):
 
 # Get OpenAI API key and model from environment variables
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
+OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-5")
 
 # Initialize the FastAPI app
 app = FastAPI()
