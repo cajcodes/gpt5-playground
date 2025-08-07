@@ -33,12 +33,8 @@ export default function ChatPage() {
   const ws = useRef<WebSocket | null>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
 
-  // API/WS endpoints (env-driven for production)
-  const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
-  const WS_URL = process.env.NEXT_PUBLIC_WS_URL ?? (
-    (API_URL.startsWith("https") ? API_URL.replace("https", "wss") : API_URL.replace("http", "ws"))
-      .replace(/\/$/, "") + "/ws"
-  );
+  // API endpoint (Edge function on Vercel)
+  const API_URL = process.env.NEXT_PUBLIC_API_URL ?? ""; // when hosted on Vercel, empty = same origin
 
   const onMessageHandler = (event: MessageEvent) => {
     try {
@@ -74,26 +70,32 @@ export default function ChatPage() {
   });
   };
 
-  const connect = useCallback(() => {
-    ws.current = new WebSocket(WS_URL);
-    ws.current.onopen = () => console.log("WebSocket connected");
-    ws.current.onclose = () => {
-        console.log("WebSocket disconnected");
-        // Attempt to reconnect after a short delay
-        setTimeout(connect, 1000);
-    };
-    ws.current.onmessage = onMessageHandler;
-  }, [WS_URL]);
+  // SSE fetch helper
+  const fetchStream = async (payload: unknown) => {
+    const res = await fetch(`/api/chat`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok || !res.body) return;
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    while (true) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      const chunk = decoder.decode(value, { stream: true });
+      chunk.split("\n\n").forEach((line) => {
+        if (!line.startsWith("data: ")) return;
+        const data = line.slice(6);
+        if (data === "[END_OF_STREAM]") return;
+        onMessageHandler({ data } as MessageEvent);
+      });
+    }
+  };
 
   useEffect(() => {
     setThreadId(`thread_${Date.now()}`);
-    connect();
-
-    // Cleanup WebSocket connection on component unmount
-    return () => {
-      ws.current?.close();
-    };
-  }, [connect]);
+  }, []);
 
   useEffect(() => {
     if (ws.current) {
@@ -128,13 +130,13 @@ export default function ChatPage() {
         const systemMessage: Message = { role: "system", content: slashResult.systemMessage };
         const newMessages = [...messages, systemMessage];
         setMessages(newMessages); // Update the state with the system message
-        ws.current.send(JSON.stringify({ messages: newMessages, model: context.model, thread_id: threadId }));
+        fetchStream({ messages: newMessages, model: context.model });
       }
     } else {
       const userMessage: Message = { role: "user", content: input };
       const newMessages = [...messages, userMessage];
       setMessages(newMessages);
-      ws.current.send(JSON.stringify({ messages: newMessages, model: context.model, thread_id: threadId }));
+      fetchStream({ messages: newMessages, model: context.model });
     }
 
     setInput("");
