@@ -3,7 +3,7 @@
 import { useContext } from "react";
 import { ModelContext } from "../context/ModelContext";
 
-const models = ["gpt-4o-mini", "gpt-4o", "gpt-5 (soon)"];
+const models = ["gpt-4o-mini", "gpt-4o", "gpt-5"];
 
 export default function ModelSelector() {
   const context = useContext(ModelContext);
@@ -21,7 +21,7 @@ export default function ModelSelector() {
       className="p-2 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
     >
       {models.map((m) => (
-        <option key={m} value={m} disabled={m.includes("soon")}>
+        <option key={m} value={m}>
           {m}
         </option>
       ))}

@@ -175,7 +175,7 @@ export default function ChatPage() {
           </div>
         ))}
       </div>
-      <div className="p-4 border-t border-gray-700">
+      <div className="p-4 pb-16 border-t border-gray-700">
         <div className="flex items-center">
             <textarea
             value={input}

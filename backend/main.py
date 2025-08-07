@@ -17,6 +17,7 @@ from . import memory
 PRICING = {
     "gpt-4o-mini": {"prompt": 0.00015, "completion": 0.0006},
     "gpt-4o": {"prompt": 0.005, "completion": 0.015},
+    "gpt-5": {"prompt": 0.005, "completion": 0.015}, # Placeholder pricing
 }
 
 def calc_cost(prompt_tokens: int, completion_tokens: int, model: str):
@@ -54,10 +55,6 @@ client = AsyncOpenAI(api_key=OPENAI_API_KEY)
 class ChatRequest(BaseModel):
     messages: list
     model: str | None = None
-
-# Placeholder for the chat endpoints for now.
-# I will implement these in the next steps.
-
 
 async def chat_stream_generator(messages: list, model: str):
     """
