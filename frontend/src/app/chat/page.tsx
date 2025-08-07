@@ -146,8 +146,14 @@ export default function ChatPage() {
   return (
     <div className="flex flex-col h-screen bg-gray-800 text-white">
       <div className="p-4 border-b border-gray-700 flex justify-between items-center">
-        <ModelSelector />
-        {threadId && <MemorySwitch threadId={threadId} />}
+        <div className="flex items-baseline gap-3">
+          <h2 className="text-lg font-semibold">Hi Chris 👋</h2>
+          <span className="text-sm text-white/60">Welcome back</span>
+        </div>
+        <div className="flex items-center gap-3">
+          <ModelSelector />
+          {threadId && <MemorySwitch threadId={threadId} />}
+        </div>
       </div>
       <div ref={chatContainerRef} className="flex-1 overflow-y-auto p-4">
         {messages.filter(msg => msg.role !== 'system').map((msg, index) => (

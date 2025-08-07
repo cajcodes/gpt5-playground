@@ -14,14 +14,14 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "GPT‑5 Playground",
-  description: "Stream with GPT‑5, track costs, switch models, and experiment fast.",
+  title: "Chris’ GPT‑5 Playground",
+  description: "Chris’ space to stream with GPT‑5, track costs, switch models, and experiment fast.",
   icons: {
     icon: "/icon.svg",
   },
   metadataBase: new URL("http://localhost:3000"),
   openGraph: {
-    title: "GPT‑5 Playground",
+    title: "Chris’ GPT‑5 Playground",
     description: "Streaming chat with GPT‑5 family (gpt-5, mini, nano).",
     url: "/",
     siteName: "GPT‑5 Playground",
@@ -29,7 +29,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "GPT‑5 Playground",
+    title: "Chris’ GPT‑5 Playground",
     description: "Streaming chat with GPT‑5 family (gpt-5, mini, nano).",
   },
 };

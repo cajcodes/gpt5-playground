@@ -8,7 +8,7 @@ export default function Home() {
       <header className="mx-auto max-w-6xl px-6 py-6 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Image src="/next.svg" alt="Logo" width={28} height={28} className="dark:invert opacity-80" />
-          <span className="text-lg font-semibold tracking-tight">GPT-5 Playground</span>
+          <span className="text-lg font-semibold tracking-tight">Chris’ GPT‑5 Playground</span>
         </div>
         <Link
           href="/chat"
@@ -35,7 +35,7 @@ export default function Home() {
                 href="/chat"
                 className="inline-flex items-center gap-2 rounded-md bg-blue-600 hover:bg-blue-500 transition-colors px-5 py-3 text-base font-semibold"
               >
-                Get started →
+                Start chatting, Chris →
               </Link>
               <a
                 href="https://github.com/cajcodes/gpt5-playground"
