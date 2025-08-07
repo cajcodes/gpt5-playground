@@ -28,13 +28,12 @@ export default function ChatPage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [usage, setUsage] = useState<Usage>({ prompt_tokens: 0, completion_tokens: 0, total_tokens: 0, cost: 0 });
+  const [isSending, setIsSending] = useState(false);
   const [threadId, setThreadId] = useState("");
   const context = useContext(ModelContext);
-  const ws = useRef<WebSocket | null>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
 
-  // API endpoint (Edge function on Vercel)
-  const API_URL = process.env.NEXT_PUBLIC_API_URL ?? ""; // when hosted on Vercel, empty = same origin
+  // Edge API endpoint lives at /api/chat (same origin on Vercel)
 
   const onMessageHandler = (event: MessageEvent) => {
     try {
@@ -77,7 +76,7 @@ export default function ChatPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     });
-    if (!res.ok || !res.body) return;
+    if (!res.ok || !res.body) { setIsSending(false); return; }
     const reader = res.body.getReader();
     const decoder = new TextDecoder();
     while (true) {
@@ -91,18 +90,12 @@ export default function ChatPage() {
         onMessageHandler({ data } as MessageEvent);
       });
     }
+    setIsSending(false);
   };
 
   useEffect(() => {
     setThreadId(`thread_${Date.now()}`);
   }, []);
-
-  useEffect(() => {
-    if (ws.current) {
-        ws.current.onmessage = onMessageHandler;
-    }
-  }, [messages]);
-
 
   useEffect(() => {
     // Auto-scroll to the bottom
@@ -112,7 +105,7 @@ export default function ChatPage() {
   }, [messages]);
 
   const handleSendMessage = () => {
-    if (!input.trim() || !ws.current || ws.current.readyState !== WebSocket.OPEN || !context) {
+    if (!input.trim() || !context) {
       return;
     }
 
@@ -130,12 +123,14 @@ export default function ChatPage() {
         const systemMessage: Message = { role: "system", content: slashResult.systemMessage };
         const newMessages = [...messages, systemMessage];
         setMessages(newMessages); // Update the state with the system message
+        setIsSending(true);
         fetchStream({ messages: newMessages, model: context.model });
       }
     } else {
       const userMessage: Message = { role: "user", content: input };
       const newMessages = [...messages, userMessage];
       setMessages(newMessages);
+      setIsSending(true);
       fetchStream({ messages: newMessages, model: context.model });
     }
 
@@ -200,7 +195,13 @@ export default function ChatPage() {
                 target.style.height = `${target.scrollHeight}px`;
             }}
             />
-            <button onClick={handleSendMessage} className="ml-2 p-2 bg-blue-600 rounded-lg">Send</button>
+            <button
+              onClick={handleSendMessage}
+              disabled={isSending || !input.trim()}
+              className={`ml-2 p-2 rounded-lg ${isSending ? "bg-blue-400 cursor-not-allowed opacity-70" : "bg-blue-600"}`}
+            >
+              {isSending ? "Sending…" : "Send"}
+            </button>
         </div>
         <CostMeter totalTokens={usage.total_tokens} totalCost={usage.cost} />
       </div>
