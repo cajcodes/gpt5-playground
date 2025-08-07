@@ -15,19 +15,21 @@ from . import memory
 # --- Pricing ---
 # todo: load from config
 PRICING = {
-    # Prices are USD per 1K tokens
+    # Prices are USD per 1M tokens
     "gpt-5": {"prompt": 1.25, "completion": 10.00},
     "gpt-5-mini": {"prompt": 0.25, "completion": 2.00},
     "gpt-5-nano": {"prompt": 0.05, "completion": 0.40},
 }
 
+TOKEN_DENOMINATOR = 1_000_000  # pricing given per 1M tokens
+
 def calc_cost(prompt_tokens: int, completion_tokens: int, model: str):
-    """Calculates the cost of a request."""
+    """Calculates the cost of a request based on per‑million token pricing."""
     if model not in PRICING:
         return 0  # or raise an error
     
-    prompt_cost = (prompt_tokens / 1000) * PRICING[model]["prompt"]
-    completion_cost = (completion_tokens / 1000) * PRICING[model]["completion"]
+    prompt_cost = (prompt_tokens / TOKEN_DENOMINATOR) * PRICING[model]["prompt"]
+    completion_cost = (completion_tokens / TOKEN_DENOMINATOR) * PRICING[model]["completion"]
     
     return prompt_cost + completion_cost
 

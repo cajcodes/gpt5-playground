@@ -33,6 +33,13 @@ export default function ChatPage() {
   const ws = useRef<WebSocket | null>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
 
+  // API/WS endpoints (env-driven for production)
+  const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+  const WS_URL = process.env.NEXT_PUBLIC_WS_URL ?? (
+    (API_URL.startsWith("https") ? API_URL.replace("https", "wss") : API_URL.replace("http", "ws"))
+      .replace(/\/$/, "") + "/ws"
+  );
+
   const onMessageHandler = (event: MessageEvent) => {
     try {
         const data = JSON.parse(event.data);
@@ -68,7 +75,7 @@ export default function ChatPage() {
   };
 
   const connect = useCallback(() => {
-    ws.current = new WebSocket("ws://localhost:8000/ws");
+    ws.current = new WebSocket(WS_URL);
     ws.current.onopen = () => console.log("WebSocket connected");
     ws.current.onclose = () => {
         console.log("WebSocket disconnected");
@@ -76,7 +83,7 @@ export default function ChatPage() {
         setTimeout(connect, 1000);
     };
     ws.current.onmessage = onMessageHandler;
-  }, []);
+  }, [WS_URL]);
 
   useEffect(() => {
     setThreadId(`thread_${Date.now()}`);
