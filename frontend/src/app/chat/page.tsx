@@ -7,9 +7,6 @@ import MemorySwitch from "../../components/MemorySwitch";
 import { ModelContext } from "../../context/ModelContext";
 import { parseSlashCommand } from "../../utils/parseSlash";
 
-
-
-
 interface Message {
   role: "user" | "assistant" | "system";
   content: string;
@@ -32,53 +29,67 @@ export default function ChatPage() {
   const ws = useRef<WebSocket | null>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    setThreadId(`thread_${Date.now()}`);
-    // Initialize WebSocket connection
-    ws.current = new WebSocket("ws://localhost:8000/ws");
-
-    ws.current.onopen = () => console.log("WebSocket connected");
-    ws.current.onclose = () => console.log("WebSocket disconnected");
-
-    ws.current.onmessage = (event) => {
-        try {
-            const data = JSON.parse(event.data);
-            if (data.type === "usage") {
-              setUsage(data.usage);
-              return;
-            }
-          } catch (error) {
-            // It's a regular text chunk
-          }
-
-      if (event.data === "[END_OF_STREAM]") {
-        // End of stream message
-        // You can add any specific logic here if needed
-        return;
+  const onMessageHandler = (event: MessageEvent) => {
+    try {
+        const data = JSON.parse(event.data);
+        if (data.type === "usage") {
+          setUsage(data.usage);
+          return;
+        }
+      } catch (error) {
+        // It's a regular text chunk
       }
 
-      setMessages((prevMessages) => {
-        const lastMessage = prevMessages[prevMessages.length - 1];
-        if (lastMessage && lastMessage.role === "assistant") {
-          // Append to the last assistant message
-          const updatedMessages = [...prevMessages];
-          updatedMessages[prevMessages.length - 1] = {
-            ...lastMessage,
-            content: lastMessage.content + event.data,
-          };
-          return updatedMessages;
-        } else {
-          // Start a new assistant message
-          return [...prevMessages, { role: "assistant", content: event.data }];
-        }
-      });
+  if (event.data === "[END_OF_STREAM]") {
+    // End of stream message
+    // You can add any specific logic here if needed
+    return;
+  }
+
+  setMessages((prevMessages) => {
+    const lastMessage = prevMessages[prevMessages.length - 1];
+    if (lastMessage && lastMessage.role === "assistant") {
+      // Append to the last assistant message
+      const updatedMessages = [...prevMessages];
+      updatedMessages[prevMessages.length - 1] = {
+        ...lastMessage,
+        content: lastMessage.content + event.data,
+      };
+      return updatedMessages;
+    } else {
+      // Start a new assistant message
+      return [...prevMessages, { role: "assistant", content: event.data }];
+    }
+  });
+  };
+
+  const connect = () => {
+    ws.current = new WebSocket("ws://localhost:8000/ws");
+    ws.current.onopen = () => console.log("WebSocket connected");
+    ws.current.onclose = () => {
+        console.log("WebSocket disconnected");
+        // Attempt to reconnect after a short delay
+        setTimeout(connect, 1000);
     };
+    ws.current.onmessage = onMessageHandler;
+  }
+
+  useEffect(() => {
+    setThreadId(`thread_${Date.now()}`);
+    connect();
 
     // Cleanup WebSocket connection on component unmount
     return () => {
       ws.current?.close();
     };
   }, []);
+
+  useEffect(() => {
+    if (ws.current) {
+        ws.current.onmessage = onMessageHandler;
+    }
+  }, [messages]);
+
 
   useEffect(() => {
     // Auto-scroll to the bottom
@@ -105,7 +116,7 @@ export default function ChatPage() {
       } else if (slashResult.systemMessage) {
         const systemMessage: Message = { role: "system", content: slashResult.systemMessage };
         const newMessages = [...messages, systemMessage];
-        setMessages(newMessages);
+        setMessages(newMessages); // Update the state with the system message
         ws.current.send(JSON.stringify({ messages: newMessages, model: context.model, thread_id: threadId }));
       }
     } else {
@@ -152,20 +163,23 @@ export default function ChatPage() {
         ))}
       </div>
       <div className="p-4 border-t border-gray-700">
-        <textarea
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder="Type your message... (Shift+Enter for new line)"
-          className="w-full p-2 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-          rows={1}
-          style={{ overflowY: 'hidden' }}
-          onInput={(e) => {
-            const target = e.target as HTMLTextAreaElement;
-            target.style.height = 'auto';
-            target.style.height = `${target.scrollHeight}px`;
-          }}
-        />
+        <div className="flex items-center">
+            <textarea
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="Type your message... (Shift+Enter for new line)"
+            className="w-full p-2 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+            rows={1}
+            style={{ overflowY: 'hidden' }}
+            onInput={(e) => {
+                const target = e.target as HTMLTextAreaElement;
+                target.style.height = 'auto';
+                target.style.height = `${target.scrollHeight}px`;
+            }}
+            />
+            <button onClick={handleSendMessage} className="ml-2 p-2 bg-blue-600 rounded-lg">Send</button>
+        </div>
         <CostMeter totalTokens={usage.total_tokens} totalCost={usage.cost} />
       </div>
     </div>

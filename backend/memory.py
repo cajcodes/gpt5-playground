@@ -1,12 +1,8 @@
-import os
 from openai import AsyncOpenAI
 
 # In-memory storage for conversation summaries and memory toggle state
 summaries = {}
 memory_enabled = {}
-
-# Initialize the AsyncOpenAI client
-client = AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 async def get_context(thread_id: str, messages: list) -> list:
     """
@@ -24,7 +20,7 @@ async def get_context(thread_id: str, messages: list) -> list:
     return messages
 
 
-async def update_summary(thread_id: str, messages: list):
+async def update_summary(thread_id: str, messages: list, client: AsyncOpenAI):
     """
     Updates the summary for a given thread ID if the conversation is long enough.
     """
@@ -45,4 +41,3 @@ async def update_summary(thread_id: str, messages: list):
             summaries[thread_id] = response.choices[0].message.content
         except Exception as e:
             print(f"Error creating summary: {e}")
-

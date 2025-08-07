@@ -1,5 +1,9 @@
 import os
 from dotenv import load_dotenv
+
+# Load environment variables from .env file at the very beginning
+load_dotenv()
+
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Header
 from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -25,10 +29,6 @@ def calc_cost(prompt_tokens: int, completion_tokens: int, model: str):
     
     return prompt_cost + completion_cost
 
-
-
-# Load environment variables from .env file
-load_dotenv()
 
 # Get OpenAI API key and model from environment variables
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
@@ -165,7 +165,7 @@ async def websocket_endpoint(websocket: WebSocket):
 
             # Update summary
             assistant_message = {"role": "assistant", "content": full_response_content}
-            await memory.update_summary(thread_id, messages + [assistant_message])
+            await memory.update_summary(thread_id, messages + [assistant_message], client)
 
             # After streaming, get the full completion to access usage
             completion = await client.chat.completions.create(
@@ -195,5 +195,4 @@ async def websocket_endpoint(websocket: WebSocket):
     except Exception as e:
         print(f"An error occurred in WebSocket: {e}")
         await websocket.close(code=1011, reason=f"An error occurred: {e}")
-
 
