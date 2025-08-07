@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useContext, useCallback } from "react";
+import { useState, useEffect, useRef, useContext } from "react";
 import CostMeter from "../../components/CostMeter";
 import ModelSelector from "../../components/ModelSelector";
 import MemorySwitch from "../../components/MemorySwitch";

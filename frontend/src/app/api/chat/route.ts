@@ -81,7 +81,8 @@ export async function POST(req: NextRequest) {
         Connection: "keep-alive",
       },
     });
-  } catch (e: any) {
-    return new Response(`Error: ${e?.message ?? "unknown"}`, { status: 500 });
+  } catch (e: unknown) {
+    const message = e instanceof Error ? e.message : "unknown";
+    return new Response(`Error: ${message}`, { status: 500 });
   }
 }
