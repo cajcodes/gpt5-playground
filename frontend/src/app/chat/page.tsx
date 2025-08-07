@@ -48,7 +48,6 @@ export default function ChatPage() {
 
   if (event.data === "[END_OF_STREAM]") {
     // End of stream message
-    // You can add any specific logic here if needed
     return;
   }
 
