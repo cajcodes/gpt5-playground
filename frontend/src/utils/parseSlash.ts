@@ -1,6 +1,6 @@
 interface ParseResult {
   handled: boolean;
-  payload?: any;
+  payload?: { tool: "image_gen"; prompt: string };
   reset?: boolean;
   systemMessage?: string;
 }

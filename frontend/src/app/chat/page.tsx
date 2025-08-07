@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useContext } from "react";
+import { useState, useEffect, useRef, useContext, useCallback } from "react";
 import CostMeter from "../../components/CostMeter";
 import ModelSelector from "../../components/ModelSelector";
 import MemorySwitch from "../../components/MemorySwitch";
@@ -40,7 +40,7 @@ export default function ChatPage() {
           setUsage(data.usage);
           return;
         }
-      } catch (error) {
+      } catch {
         // It's a regular text chunk
       }
 
@@ -67,7 +67,7 @@ export default function ChatPage() {
   });
   };
 
-  const connect = () => {
+  const connect = useCallback(() => {
     ws.current = new WebSocket("ws://localhost:8000/ws");
     ws.current.onopen = () => console.log("WebSocket connected");
     ws.current.onclose = () => {
@@ -76,7 +76,7 @@ export default function ChatPage() {
         setTimeout(connect, 1000);
     };
     ws.current.onmessage = onMessageHandler;
-  }
+  }, []);
 
   useEffect(() => {
     setThreadId(`thread_${Date.now()}`);
@@ -86,7 +86,7 @@ export default function ChatPage() {
     return () => {
       ws.current?.close();
     };
-  }, []);
+  }, [connect]);
 
   useEffect(() => {
     if (ws.current) {
