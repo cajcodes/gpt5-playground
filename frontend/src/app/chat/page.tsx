@@ -6,6 +6,10 @@ import ModelSelector from "../../components/ModelSelector";
 import MemorySwitch from "../../components/MemorySwitch";
 import { ModelContext } from "../../context/ModelContext";
 import { parseSlashCommand } from "../../utils/parseSlash";
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import rehypeHighlight from 'rehype-highlight';
+
 
 interface Message {
   role: "user" | "assistant" | "system";
@@ -151,13 +155,22 @@ export default function ChatPage() {
             } mb-4`}
           >
             <div
-              className={`max-w-lg p-3 rounded-lg ${
+              className={`prose dark:prose-invert max-w-lg p-3 rounded-lg ${
                 msg.role === "user"
                   ? "bg-blue-600 text-white"
                   : "bg-gray-100 text-black"
               }`}
             >
-              {msg.content}
+              {msg.role === 'assistant' ? (
+                <ReactMarkdown
+                    remarkPlugins={[remarkGfm]}
+                    rehypePlugins={[rehypeHighlight]}
+                >
+                    {msg.content}
+                </ReactMarkdown>
+                ) : (
+                msg.content
+                )}
             </div>
           </div>
         ))}
