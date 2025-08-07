@@ -1,0 +1,15 @@
+# Virtual environment
+.venv/
+
+# Python cache
+__pycache__/
+
+# Environment variables
+.env
+
+# Log files
+*.log
+
+# macOS
+.DS_Store
+
