@@ -4,6 +4,11 @@ import OpenAI from "openai";
 export const runtime = "edge"; // Vercel Edge
 
 export async function POST(req: NextRequest) {
+  // Simple auth check: require auth cookie
+  const isLoggedIn = req.cookies.get("auth")?.value === "1";
+  if (!isLoggedIn) {
+    return new Response("Unauthorized", { status: 401 });
+  }
   try {
     const { messages, model } = await req.json();
 

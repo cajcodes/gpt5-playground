@@ -153,6 +153,15 @@ export default function ChatPage() {
         <div className="flex items-center gap-3">
           <ModelSelector />
           {threadId && <MemorySwitch threadId={threadId} />}
+          <button
+            onClick={() => {
+              document.cookie = "auth=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+              window.location.href = "/login";
+            }}
+            className="px-3 py-1 text-sm bg-red-600 hover:bg-red-500 rounded"
+          >
+            Logout
+          </button>
         </div>
       </div>
       <div ref={chatContainerRef} className="flex-1 overflow-y-auto p-4">
