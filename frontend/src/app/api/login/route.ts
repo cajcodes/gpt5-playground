@@ -23,7 +23,7 @@ export async function POST(request: Request) {
       maxAge: 60 * 60 * 24 * 30, // 30 days
     });
     return response;
-  } catch (error) {
+  } catch {
     return NextResponse.json({ ok: false, error: "Bad request" }, { status: 400 });
   }
 }
